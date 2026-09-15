@@ -48,6 +48,26 @@ export async function getProducts() {
 // Create order via Netlify Function
 export async function createOrder(orderData) {
   try {
+    if (window.location.protocol === 'file:') {
+      const orderId = `LSLOCAL${Date.now()}`;
+      const createdAt = new Date().toISOString();
+      const order = {
+        orderId,
+        customerName: orderData.fullName,
+        mobile: orderData.mobile,
+        email: orderData.email,
+        totalAmount: orderData.totalAmount,
+        status: 'Payment Verification Pending',
+        createdAt,
+        items: (orderData.cartItems || []).map(item => ({ ...item, productName: item.productName || item.name })),
+        timeline: [{ status: 'Payment Verification Pending', date: createdAt, note: 'Order received and waiting for payment verification' }]
+      };
+      const orders = JSON.parse(localStorage.getItem('localOrders') || '[]');
+      orders.unshift(order);
+      localStorage.setItem('localOrders', JSON.stringify(orders));
+      return { success: true, orderId };
+    }
+
     const response = await fetch('/.netlify/functions/create-order', {
       method: 'POST',
       headers: {
@@ -70,6 +90,12 @@ export async function createOrder(orderData) {
 // Track order
 export async function trackOrder(orderId, mobile) {
   try {
+    if (window.location.protocol === 'file:') {
+      const order = JSON.parse(localStorage.getItem('localOrders') || '[]')
+        .find(item => item.orderId === orderId && String(item.mobile) === String(mobile));
+      return order ? { success: true, order } : { success: false, message: 'Order not found' };
+    }
+
     const response = await fetch(`/.netlify/functions/track-order?orderId=${orderId}&mobile=${mobile}`);
     const data = await response.json();
     return data;

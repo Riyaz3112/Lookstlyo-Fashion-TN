@@ -100,6 +100,10 @@ To change:
 - **Images**: All product images hosted locally
 - **CDN Dependencies**: Some libraries loaded from CDN (React, Tailwind, etc.)
 
+### GitHub Pages and PHP
+
+GitHub Pages serves static HTML, CSS, JavaScript, and images only. It does not run PHP, MySQL, or Netlify Functions. The public pages use `.html` routes and the catalogue has a local fallback, but live product data, order creation, tracking, and admin operations still require the existing Netlify Functions or another PHP-capable host. For the complete store workflow, deploy this repository through Netlify rather than GitHub Pages.
+
 ## 📞 Support
 
 For issues or questions:

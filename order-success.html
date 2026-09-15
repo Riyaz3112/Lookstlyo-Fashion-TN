@@ -7,7 +7,6 @@
     <script defer src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gray-50 font-sans text-gray-900">
-<meta http-equiv="refresh" content="0; url=order-success.php">
     <!-- Navigation -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,6 +61,9 @@
                 <div class="space-y-3">
                     <a href="track-order.html" class="block w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 rounded-lg transition">
                         Track Order
+                    </a>
+                    <a id="orderPlacedWhatsApp" href="https://wa.me/c/918680857511" target="_blank" rel="noopener noreferrer" class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition">
+                        Notify LookStylo on WhatsApp
                     </a>
                     <a href="shop.html" class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-lg transition">
                         Continue Shopping
@@ -149,6 +151,8 @@
             if (orderId) {
                 document.getElementById('orderId').textContent = orderId;
                 document.getElementById('modalOrderId').textContent = orderId;
+                const message = `New LookStylo order placed: ${orderId}. Please confirm my payment and order.`;
+                document.getElementById('orderPlacedWhatsApp').href = `https://wa.me/918680857511?text=${encodeURIComponent(message)}`;
             } else {
                 document.getElementById('orderId').textContent = 'Unknown';
                 document.getElementById('modalOrderId').textContent = 'Unknown';

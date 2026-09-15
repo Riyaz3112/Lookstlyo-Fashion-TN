@@ -1,4 +1,6 @@
-# Netlify + Firebase Setup Guide
+# Netlify + Firebase Setup Guide (Legacy)
+
+> The active deployment now uses Supabase. Follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md) and run [supabase-schema.sql](supabase-schema.sql). This document is retained only for the previous Firebase migration reference.
 
 ## Overview
 
@@ -166,7 +168,14 @@ FIREBASE_PROJECT_ID = YOUR_PROJECT_ID
 FIREBASE_STORAGE_BUCKET = YOUR_PROJECT.appspot.com
 FIREBASE_MESSAGING_SENDER_ID = YOUR_MESSAGING_SENDER_ID
 FIREBASE_APP_ID = YOUR_APP_ID
+FIREBASE_DATABASE_URL = https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com
+FIREBASE_DATABASE_SECRET = YOUR_SERVER_SIDE_DATABASE_SECRET
+ADMIN_TOKEN_SECRET = A_LONG_RANDOM_SECRET_FOR_ADMIN_SESSIONS
 ```
+
+`FIREBASE_DATABASE_SECRET` must be configured only in Netlify environment variables. Do not put it in `firebase-init.js` or commit it to GitHub. The checkout function writes orders to `/orders/{orderId}` and the tracking function reads the order after checking the submitted mobile number.
+
+`ADMIN_TOKEN_SECRET` signs admin sessions. Set it to a long random value before production deployment. The admin dashboard uses protected functions to list orders and update statuses.
 
 ---
 

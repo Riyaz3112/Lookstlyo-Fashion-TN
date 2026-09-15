@@ -8,7 +8,6 @@
     <script defer src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="min-h-screen bg-gray-50 font-sans text-gray-900">
-<meta http-equiv="refresh" content="0; url=shop.php">
     <!-- Navigation -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,7 +18,7 @@
                 <div class="flex items-center space-x-6">
                     <a href="index.html" class="text-gray-700 hover:text-purple-700 font-medium">Home</a>
                     <a href="cart.html" class="text-gray-700 hover:text-purple-700 font-medium">Cart (<span id="cartCount">0</span>)</a>
-                    <a href="admin/login.php" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-full font-medium transition">Admin</a>
+                    <a href="admin/login.html" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-full font-medium transition">Admin</a>
                 </div>
             </div>
         </div>
@@ -64,11 +63,16 @@
     <script>
         async function fetchProducts(){
             try{
-                const res = await fetch('products-api.php');
+                const res = await fetch('/.netlify/functions/get-products');
                 const data = await res.json();
                 if (data.success) return data.products;
             }catch(e){ console.error(e); }
-            return [];
+            return [
+                { id: 1, name: 'Premium Oversized T-Shirt', price: 499, image: 'IMG101.jpeg', description: 'High-quality oversized t-shirt perfect for streetwear', sizes: 'S,M,L,XL' },
+                { id: 2, name: 'Baggy T-Shirt Black', price: 599, image: 'IMG102.jpeg', description: 'Trendy baggy fit t-shirt in black', sizes: 'S,M,L,XL' },
+                { id: 3, name: 'Football Jersey', price: 799, image: 'IMG103.jpeg', description: 'Sports-style football jersey', sizes: 'M,L,XL' },
+                { id: 4, name: 'Track Pants', price: 899, image: 'IMG104.jpeg', description: 'Comfortable track pants with jogger style', sizes: 'M,L,XL' }
+            ];
         }
 
         function formatPrice(n){ return '₹' + n; }
@@ -82,11 +86,11 @@
                 productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition';
                 const img = product.images && product.images.length ? product.images[0] : (product.image || '');
                 productCard.innerHTML = `
-                    <a href="product.php?id=${product.id}" class="block">
+                    <a href="shop.html#products" class="block">
                         <img src="${img}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.src='https://placehold.co/250x200/301040/ffffff?text=${encodeURIComponent(product.name)}'">
                     </a>
                     <div class="p-4">
-                        <h3 class="font-bold text-lg mb-2"><a href="product.php?id=${product.id}" class="hover:underline">${product.name}</a></h3>
+                        <h3 class="font-bold text-lg mb-2"><a href="shop.html#products" class="hover:underline">${product.name}</a></h3>
                         <p class="text-gray-600 text-sm mb-4">${product.description || ''}</p>
                         <p class="text-purple-700 font-bold text-xl mb-4">${formatPrice(product.price)}</p>
                         <div class="space-y-3 mb-4">
