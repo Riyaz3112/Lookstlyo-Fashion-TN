@@ -37,7 +37,7 @@ export async function initFirebase() {
 export async function getProducts() {
   try {
     const response = await fetch('/.netlify/functions/get-products');
-    const data = await response.json();
+    const data = await readJsonResponse(response, 'Product service');
     return data.products || [];
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -106,13 +106,25 @@ export async function trackOrder(orderId, mobile) {
       return order ? { success: true, order } : { success: false, message: 'Order not found' };
     }
 
-    const response = await fetch(`/.netlify/functions/track-order?orderId=${orderId}&mobile=${mobile}`);
-    const data = await response.json();
+    const response = await fetch(`/.netlify/functions/track-order?orderId=${encodeURIComponent(orderId)}&mobile=${encodeURIComponent(mobile)}`);
+    const data = await readJsonResponse(response, 'Tracking service');
     return data;
   } catch (error) {
     console.error('Error tracking order:', error);
     return { success: false, message: error.message };
   }
+}
+
+async function readJsonResponse(response, serviceName) {
+  const responseText = await response.text();
+  let data;
+  try {
+    data = JSON.parse(responseText);
+  } catch (error) {
+    throw new Error(`${serviceName} returned HTTP ${response.status} instead of JSON. Redeploy Netlify Functions and check Netlify configuration.`);
+  }
+  if (!response.ok) throw new Error(data.message || `${serviceName} returned HTTP ${response.status}`);
+  return data;
 }
 
 // Admin login
@@ -126,7 +138,7 @@ export async function adminLogin(username, password) {
       body: JSON.stringify({ username, password })
     });
     
-    const data = await response.json();
+    const data = await readJsonResponse(response, 'Admin service');
     if (data.success) {
       localStorage.setItem('adminToken', data.token);
       return { success: true };
