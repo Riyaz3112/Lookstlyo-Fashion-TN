@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop - LookStylo Clothing</title>
+
     <script defer src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -12,6 +13,8 @@
         .product-photo-frame img { display: block; width: 100%; height: 100%; object-fit: contain; background: #f3f4f6; }
         .product-card-content { flex: 1; display: flex; flex-direction: column; }
         .product-card-content .add-to-cart-btn { margin-top: auto; }
+        .product-gallery-thumb { cursor: pointer; border: 2px solid transparent; border-radius: 3px; }
+        .product-gallery-thumb.active { border-color: #7c3aed; }
         @media (max-width: 640px) {
             .product-photo-frame { height: 240px; flex-basis: 240px; }
         }
@@ -84,7 +87,10 @@
                 { id: 1, name: 'Premium Oversized T-Shirt', price: 599, image: 'IMG101.jpeg', description: 'Viscous fabric', sizes: 'M,L,XL', colors: 3 },
                 { id: 2, name: 'NS Shorts', price: 249, image: 'IMG111.jpeg', description: '3-Line Model | Premium Quality', sizes: 'M,L,XL', colors: 10, bulkPrice: 'Buy 5 @ ₹999' },
                 { id: 3, name: 'Football Jersey', price: 299, image: 'IMG11.jpeg', description: 'Sports-style football jersey', sizes: 'M,L,XL' },
-                { id: 4, name: 'NEW PREMIUM STREET BAGGY', price: 349, image: 'IMG112.jpeg', description: 'Side contrast panel baggy | Premium NS Lycra fabric', sizes: 'M,L,XL,2XL', colors: 8, style: 'Street Baggy', brand: 'ADIDAS' }
+                { id: 4, name: 'NEW PREMIUM STREET BAGGY', price: 349, image: 'IMG112.jpeg', description: 'Side contrast panel baggy | Premium NS Lycra fabric', sizes: 'M,L,XL,2XL', colors: 8, style: 'Street Baggy', brand: 'ADIDAS' },
+                { id: 5, name: 'FLANNEL CHECK FRONT EMBROIDERY', price: 599, image: 'IMAGE112233.jpeg', description: 'Front embroidery | Twill fabric', sizes: 'M,L,XL' },
+                { id: 6, name: 'NEW STREETWEAR BAGGY OVERSIZED DROP SHOULDER SHIRT', price: 549, image: 'IMAGE112235.jpeg', images: ['IMAGE112235.jpeg', 'IMAGE112236.jpeg', 'IMAGE112237.jpeg', 'IMAGE112239.jpeg', 'IMAGE112240.jpeg', 'IMAGE112241.jpeg', 'IMAGE112242.jpeg'], description: 'Tie print with front and back print | Heavy GSM cotton fabric', sizes: 'M,L,XL', designs: 8 },
+                { id: 7, name: 'PREMIUM QUALITY POLO T-SHIRTS', price: 379, image: 'IMAGE112234.jpeg', description: 'Premium quality | Everyday polo fit', sizes: 'M,L,XL', bulkPrice: 'Buy 3 @ ₹999' }
             ];
         }
 
@@ -94,20 +100,25 @@
             const products = await fetchProducts();
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
-            products.forEach(product => {
+            products.forEach((product, productIndex) => {
                 const productCard = document.createElement('div');
                 productCard.className = 'collection-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition';
                 const img = product.images && product.images.length ? product.images[0] : (product.image || '');
+                const mainImageId = `product-main-image-${productIndex}`;
                 productCard.innerHTML = `
                     <a href="shop.html#products" class="product-photo-frame">
-                        <img src="${img}" alt="${product.name}" onerror="this.src='IMG11.jpeg'">
+                        <img id="${mainImageId}" src="${img}" alt="${product.name}" onerror="this.src='IMG11.jpeg'">
                     </a>
+                    ${product.images && product.images.length > 1 ? `<div class="flex gap-1 overflow-x-auto bg-gray-50 p-2">${product.images.map((image, index) => `<button type="button" class="product-gallery-thumb ${index === 0 ? 'active' : ''}" data-main-image="${mainImageId}" data-image="${image}" aria-label="Show ${product.name} design ${index + 1}"><img src="${image}" alt="${product.name} design ${index + 1}" class="h-12 w-12 shrink-0 object-cover" onerror="this.parentElement.style.display='none'"></button>`).join('')}</div>` : ''}
                     <div class="product-card-content p-4">
                         <h3 class="font-bold text-lg mb-2"><a href="shop.html#products" class="hover:underline">${product.name}</a></h3>
                         <p class="text-gray-600 text-sm mb-4">${product.description || ''}</p>
                         ${product.name === 'Premium Oversized T-Shirt' ? '<p class="text-gray-700 text-sm mb-2"><strong>Sizes:</strong> M, L, XL</p><p class="text-gray-700 text-sm mb-4"><strong>Colours:</strong> 3</p>' : ''}
                         ${product.name === 'NS Shorts' ? '<p class="text-gray-700 text-sm mb-2"><strong>Model:</strong> 3-Line</p><p class="text-gray-700 text-sm mb-2"><strong>Quality:</strong> Premium</p><p class="text-gray-700 text-sm mb-2"><strong>Colours:</strong> 10</p><p class="text-green-700 text-sm font-bold mb-4">Buy 1 @ ₹249 &nbsp; | &nbsp; Buy 5 @ ₹999</p>' : ''}
                         ${product.name === 'NEW PREMIUM STREET BAGGY' ? '<p class="text-gray-700 text-sm mb-2"><strong>Fabric:</strong> Premium NS Lycra Fabric</p><p class="text-gray-700 text-sm mb-2"><strong>Colours:</strong> 8</p><p class="text-gray-700 text-sm mb-2"><strong>Style:</strong> Street Baggy</p><p class="text-gray-700 text-sm mb-2"><strong>Brand:</strong> ADIDAS</p><p class="text-gray-700 text-sm mb-4"><strong>Sizes:</strong> M, L, XL, 2XL</p>' : ''}
+                        ${product.name === 'FLANNEL CHECK FRONT EMBROIDERY' ? '<p class="text-gray-700 text-sm mb-2"><strong>Fabric:</strong> Twill</p><p class="text-gray-700 text-sm mb-2"><strong>Detail:</strong> Front Embroidery</p><p class="text-gray-700 text-sm mb-4"><strong>Sizes:</strong> M, L, XL</p>' : ''}
+                        ${product.name === 'NEW STREETWEAR BAGGY OVERSIZED DROP SHOULDER SHIRT' ? '<p class="text-gray-700 text-sm mb-2"><strong>Model:</strong> New Streetwear Baggy Oversized Drop Shoulder</p><p class="text-gray-700 text-sm mb-2"><strong>Fabric:</strong> Heavy GSM Cotton</p><p class="text-gray-700 text-sm mb-2"><strong>Print:</strong> Tie print, front and back print</p><p class="text-gray-700 text-sm mb-2"><strong>Designs:</strong> 8</p><p class="text-gray-700 text-sm mb-4"><strong>Sizes:</strong> M, L, XL</p>' : ''}
+                        ${product.name === 'PREMIUM QUALITY POLO T-SHIRTS' ? '<p class="text-gray-700 text-sm mb-2"><strong>Quality:</strong> Premium</p><p class="text-gray-700 text-sm mb-2"><strong>Style:</strong> Everyday Polo Fit</p><p class="text-gray-700 text-sm mb-2"><strong>Sizes:</strong> M, L, XL</p><p class="text-green-700 text-sm font-bold mb-4">Buy 1 @ ₹379 &nbsp; | &nbsp; Buy 3 @ ₹999</p>' : ''}
                         <p class="text-purple-700 font-bold text-xl mb-4">${formatPrice(product.price)}</p>
                         <div class="space-y-3 mb-4">
                             <div>
@@ -128,6 +139,12 @@
             });
 
             document.querySelectorAll('.add-to-cart-btn').forEach(btn => btn.addEventListener('click', addToCart));
+            document.querySelectorAll('.product-gallery-thumb').forEach(thumb => thumb.addEventListener('click', () => {
+                const mainImage = document.getElementById(thumb.dataset.mainImage);
+                if (mainImage) mainImage.src = thumb.dataset.image;
+                thumb.parentElement.querySelectorAll('.product-gallery-thumb').forEach(item => item.classList.remove('active'));
+                thumb.classList.add('active');
+            }));
         }
 
         function addToCart(e){
