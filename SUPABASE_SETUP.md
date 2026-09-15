@@ -36,3 +36,5 @@ Checkout creates the customer, order, order items, and initial `Payment Verifica
 ## 4. Deploy
 
 Connect the GitHub repository to Netlify. Netlify will publish the static site and deploy `netlify/functions`. GitHub Pages can show the frontend, but it cannot run these functions or persist orders.
+
+After changing `netlify.toml` or a function, trigger a fresh Netlify deploy. Confirm that `https://YOUR_SITE.netlify.app/.netlify/functions/create-order` is reachable through the deployed site; a missing function should return a JSON/HTTP error, not the homepage HTML.

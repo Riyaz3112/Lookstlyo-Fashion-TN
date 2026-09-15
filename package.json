@@ -1,28 +1,5 @@
 {
-  "name": "lookstylo-billing",
-  "version": "1.0.0",
-  "description": "Modern billing and inventory management system for fashion retail",
-  "main": "index.html",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/billing.git"
-  },
-  "keywords": [
-    "billing",
-    "invoice",
-    "inventory",
-    "accounting",
-    "retail",
-    "fashion",
-    "pos"
-  ],
-  "author": "Shariff Enterprises",
-  "license": "MIT",
-  "scripts": {
-    "start": "http-server -p 8000",
-    "serve": "npx http-server -p 8000"
-  },
-  "devDependencies": {
-    "http-server": "^14.1.1"
-  }
+  "name": "lookstylo-website",
+  "private": true,
+  "type": "module"
 }

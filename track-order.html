@@ -141,6 +141,10 @@
     <script type="module">
         import { trackOrder } from './firebase-init.js';
 
+        let activeOrderId = '';
+        let activeMobile = '';
+        let trackingTimer = null;
+
         // Handle form submission
         document.getElementById('trackForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -152,7 +156,10 @@
                 const result = await trackOrder(orderId, mobile);
 
                 if (result.success && result.order) {
+                    activeOrderId = orderId;
+                    activeMobile = mobile;
                     displayOrder(result.order);
+                    startLiveTracking();
                 } else {
                     showError('Order not found. Please check your Order ID and mobile number.');
                 }
@@ -173,7 +180,7 @@
 
             // Display timeline
             let timelineHtml = '';
-            order.timeline.forEach((entry, index) => {
+            (order.timeline || []).forEach((entry, index) => {
                 const isActive = index === order.timeline.length - 1;
                 timelineHtml += `
                     <div class="flex gap-4">
@@ -193,7 +200,7 @@
 
             // Display items
             let itemsHtml = '';
-            order.items.forEach(item => {
+            (order.items || []).forEach(item => {
                 itemsHtml += `
                     <div class="border-b pb-3">
                         <p class="font-bold">${item.productName}</p>
@@ -205,6 +212,15 @@
             document.getElementById('itemsList').innerHTML = itemsHtml;
         }
 
+        function startLiveTracking() {
+            clearInterval(trackingTimer);
+            trackingTimer = setInterval(async () => {
+                if (!activeOrderId || !activeMobile) return;
+                const result = await trackOrder(activeOrderId, activeMobile);
+                if (result.success && result.order) displayOrder(result.order);
+            }, 10000);
+        }
+
         function showError(message) {
             document.getElementById('trackForm').parentElement.style.display = 'none';
             document.getElementById('orderResult').classList.add('hidden');
@@ -213,6 +229,9 @@
         }
 
         window.resetForm = function() {
+            clearInterval(trackingTimer);
+            activeOrderId = '';
+            activeMobile = '';
             document.getElementById('trackForm').reset();
             document.getElementById('trackForm').parentElement.style.display = 'block';
             document.getElementById('orderResult').classList.add('hidden');

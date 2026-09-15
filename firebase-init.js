@@ -76,7 +76,17 @@ export async function createOrder(orderData) {
       body: JSON.stringify(orderData)
     });
     
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      const contentType = response.headers.get('content-type') || 'unknown content type';
+      throw new Error(`Order service returned ${response.status} (${contentType}). Redeploy Netlify Functions and verify netlify.toml.`);
+    }
+    if (!response.ok) {
+      return { success: false, message: data.message || `Order service returned HTTP ${response.status}` };
+    }
     if (data.success) {
       return { success: true, orderId: data.orderId };
     }
