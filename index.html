@@ -65,6 +65,13 @@
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
         document.addEventListener('DOMContentLoaded', function () {
+            const jolarpattaiHeading = Array.from(document.querySelectorAll('h3')).find((heading) => heading.textContent.trim() === 'Jolarpattai Branch');
+            if (jolarpattaiHeading && !jolarpattaiHeading.previousElementSibling?.classList.contains('branch-status')) {
+                const branchStatus = document.createElement('p');
+                branchStatus.className = 'branch-status mt-3 inline-flex w-fit bg-red-100 px-3 py-1 text-[10px] font-bold uppercase tracking-[.18em] text-red-700';
+                branchStatus.textContent = 'Closed - Opening Soon';
+                jolarpattaiHeading.parentElement.insertBefore(branchStatus, jolarpattaiHeading);
+            }
             if (window.lucide) window.lucide.createIcons();
             const staticRoutes = { 'shop.php': 'shop.html', 'cart.php': 'cart.html', 'my-orders.php': 'track-order.html' };
             document.querySelectorAll('a[href]').forEach((link) => {
