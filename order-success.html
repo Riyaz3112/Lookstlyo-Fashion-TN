@@ -63,7 +63,7 @@
                         Track Order
                     </a>
                     <a id="orderPlacedWhatsApp" href="https://wa.me/c/918680857511" target="_blank" rel="noopener noreferrer" class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition">
-                        Notify LookStylo on WhatsApp
+                        Confirm Order on WhatsApp
                     </a>
                     <a href="shop.html" class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-lg transition">
                         Continue Shopping
@@ -151,7 +151,7 @@
             if (orderId) {
                 document.getElementById('orderId').textContent = orderId;
                 document.getElementById('modalOrderId').textContent = orderId;
-                const message = `New LookStylo order placed: ${orderId}. Please confirm my payment and order.`;
+                const message = `LookStylo order confirmation request: ${orderId}. Please confirm my payment and order.`;
                 document.getElementById('orderPlacedWhatsApp').href = `https://wa.me/918680857511?text=${encodeURIComponent(message)}`;
             } else {
                 document.getElementById('orderId').textContent = 'Unknown';

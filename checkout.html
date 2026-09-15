@@ -241,6 +241,9 @@
                         <button type="submit" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 rounded transition">
                             Place Order
                         </button>
+                        <button type="button" id="whatsappOrderButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded transition">
+                            Order Through WhatsApp
+                        </button>
                     </form>
                 </div>
 
@@ -266,7 +269,7 @@
     </script>
 
     <script type="module">
-        import { createOrder } from './firebase-init.js';
+        import { createOrder } from './firebase-init.js?v=20260915-2';
 
             // Generate UPI QR code (server-side proxy)
             function generateQRCode() {
@@ -385,6 +388,23 @@
                 alert('Error: ' + error.message);
             }
         }
+
+        document.getElementById('whatsappOrderButton').addEventListener('click', () => {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (!cart.length) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const items = cart.map(item => `${item.name} | Size: ${item.size || '-'} | Color: ${item.color || '-'} | Qty: ${item.quantity} | ₹${item.price}`).join('\n');
+            const total = cart.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
+            const name = document.getElementById('fullName').value.trim() || 'Not provided';
+            const mobile = document.getElementById('mobile').value.trim() || 'Not provided';
+            const address = document.getElementById('address').value.trim() || 'Not provided';
+            const utr = document.getElementById('utrNumber').value.trim() || 'Not provided';
+            const message = `*LookStylo Order Confirmation Request*\n\nPlease confirm my order.\n\n*Customer:* ${name}\n*Mobile:* ${mobile}\n*Address:* ${address}\n*UTR:* ${utr}\n\n*Items:*\n${items}\n\n*Total:* ₹${total.toFixed(2)}`;
+            window.open(`https://wa.me/918680857511?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+        });
 
         // Generate QR code on load
         generateQRCode();
