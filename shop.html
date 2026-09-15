@@ -8,13 +8,100 @@
     <script defer src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .collection-card { display: flex; flex-direction: column; height: 100%; }
-        .product-photo-frame { display: block; height: 280px; flex: 0 0 280px; overflow: hidden; background: #f3f4f6; }
-        .product-photo-frame img { display: block; width: 100%; height: 100%; object-fit: contain; background: #f3f4f6; }
-        .product-card-content { flex: 1; display: flex; flex-direction: column; }
+        :root {
+            --ink: #171717;
+            --paper: #f5f1eb;
+            --card: #ffffff;
+            --muted: #666666;
+            --line: rgba(23,23,23,.1);
+            --gold: #d7a65f;
+            --gold-deep: #b7791d;
+            --accent: #5e2d91;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            background: linear-gradient(180deg, #f8f4ef 0%, #f3efe8 100%);
+            color: var(--ink);
+            font-family: Inter, "Segoe UI", sans-serif;
+        }
+        a { text-decoration: none; }
+        img { display: block; max-width: 100%; }
+
+        .brand-shell { display: flex; align-items: center; gap: .8rem; }
+        .brand-mark { width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,.08)); }
+        .brand-wordmark { display: inline-flex; flex-direction: column; line-height: 1; }
+        .brand-wordmark strong { font-family: Georgia, 'Times New Roman', serif; font-size: 1.1rem; letter-spacing: .16em; }
+        .brand-wordmark small { margin-top: .2rem; font-size: .52rem; letter-spacing: .48em; text-transform: uppercase; }
+        .collection-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: rgba(255,255,255,.96);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 16px 30px rgba(17,17,17,.045);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .collection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 22px 45px rgba(17,17,17,.12);
+        }
+        .product-photo-frame {
+            display: block;
+            height: 280px;
+            flex: 0 0 280px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #f4f2f0 0%, #efebe6 100%);
+        }
+        .product-photo-frame img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #f3f4f6;
+        }
+        .product-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.2rem 1.15rem 1.25rem;
+        }
         .product-card-content .add-to-cart-btn { margin-top: auto; }
-        .product-gallery-thumb { cursor: pointer; border: 2px solid transparent; border-radius: 3px; }
-        .product-gallery-thumb.active { border-color: #7c3aed; }
+        .product-gallery-thumb {
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color .2s ease, transform .2s ease;
+            background: white;
+        }
+        .product-gallery-thumb:hover { transform: translateY(-1px); }
+        .product-gallery-thumb.active { border-color: var(--gold-deep); }
+        .product-card-content h3 {
+            letter-spacing: -.03em;
+            line-height: 1.35;
+        }
+        .size-select, .color-select {
+            border-color: rgba(23,23,23,.15);
+            border-radius: 10px;
+            background: #fff;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .size-select:focus, .color-select:focus {
+            outline: none;
+            border-color: rgba(183,121,29,.7);
+            box-shadow: 0 0 0 3px rgba(183,121,29,.12);
+        }
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #7241a8 100%);
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(94,45,145,.18);
+        }
+        .add-to-cart-btn:hover {
+            filter: brightness(1.03);
+        }
         @media (max-width: 640px) {
             .product-photo-frame { height: 240px; flex-basis: 240px; }
         }
@@ -22,30 +109,31 @@
 </head>
 <body class="min-h-screen bg-gray-50 font-sans text-gray-900">
     <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="sticky top-0 z-50 border-b border-black/10 bg-[#f8f4ef]/95 backdrop-blur-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20">
-                <div class="flex items-center">
-                    <img src="slazzer-preview-x2n1h.png" alt="Lookstylo Logo" class="h-16 w-auto object-contain">
+            <div class="flex justify-between h-20 items-center">
+                <div class="brand-shell">
+                    <img src="slazzer-preview-x2n1h.png" alt="Lookstylo Logo" class="brand-mark">
+                    <span class="brand-wordmark"><strong>LOOKSTYLO</strong><small>Fashion</small></span>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <a href="index.html" class="text-gray-700 hover:text-purple-700 font-medium">Home</a>
-                    <a href="cart.html" class="text-gray-700 hover:text-purple-700 font-medium">Cart (<span id="cartCount">0</span>)</a>
-                    <a href="admin.html" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-full font-medium transition">Admin</a>
+                <div class="flex items-center space-x-6 text-sm font-semibold uppercase tracking-[.12em] text-black/70">
+                    <a href="index.html" class="transition hover:text-amber-700">Home</a>
+                    <a href="cart.html" class="transition hover:text-amber-700">Cart (<span id="cartCount">0</span>)</a>
+                    <a href="admin.html" class="rounded-full bg-[#151515] px-4 py-2 text-white transition hover:bg-amber-700">Admin</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Opening Soon Banner -->
-    <div id="openingBanner" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-4 shadow-lg">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div id="openingBanner" class="bg-gradient-to-r from-[#1d1d1d] via-[#171717] to-[#2d1d0c] text-white px-4 py-4 shadow-lg">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <div class="flex-1">
-                <h3 class="font-bold text-lg mb-1">🎉 Sportswear Store Opening Soon!</h3>
-                <p class="text-sm">Shop No. 2, Opposite Post Office, Pakkirithakka, Tirupathur Main Road, Jolarpattai – 635853</p>
+                <h3 class="font-bold text-lg mb-1">Premium Sportswear & Everyday Fashion</h3>
+                <p class="text-sm text-white/80">Shop No. 2, Opposite Post Office, Pakkirithakka, Tirupathur Main Road, Jolarpattai – 635853</p>
             </div>
             <div class="flex gap-2">
-                <a href="https://www.google.com/maps/search/?api=1&query=Shop+No.+2,+Opposite+Post+Office,+Pakkirithakka,+Tirupathur+Main+Road,+Jolarpattai+635853" target="_blank" rel="noopener noreferrer" class="bg-white text-red-600 font-bold px-4 py-2 rounded hover:bg-gray-100 transition text-sm">
+                <a href="https://www.google.com/maps/search/?api=1&query=Shop+No.+2,+Opposite+Post+Office,+Pakkirithakka,+Tirupathur+Main+Road,+Jolarpattai+635853" target="_blank" rel="noopener noreferrer" class="bg-white text-[#151515] font-bold px-4 py-2 rounded-full hover:bg-gray-100 transition text-sm">
                     View on Map
                 </a>
                 <button onclick="closeBanner()" class="text-white hover:text-gray-200 text-xl font-bold">
@@ -58,9 +146,10 @@
     <!-- Shop Section -->
     <section id="products" class="py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
-            <h1 class="text-4xl font-bold mb-12 text-center">Our Collections</h1>
-            
-            <!-- Products Grid -->
+            <div class="mb-10 text-center">
+                <p class="mb-3 text-xs font-bold uppercase tracking-[.32em] text-amber-700">LookStylo edit</p>
+                <h1 class="display text-5xl sm:text-6xl font-black tracking-tight">Our Collections</h1>
+            </div>
             <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Products will be loaded here by JavaScript -->
             </div>
