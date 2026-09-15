@@ -238,11 +238,8 @@
                             <p class="mt-3 text-sm text-gray-700"><strong>UPI ID:</strong> 9360232991@okbizaxis</p>
                         </div>
 
-                        <button type="submit" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 rounded transition">
-                            Place Order
-                        </button>
                         <button type="button" id="whatsappOrderButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded transition">
-                            Order Through WhatsApp
+                            Confirm Order Through WhatsApp
                         </button>
                     </form>
                 </div>
@@ -253,9 +250,10 @@
                     <div id="orderSummary" class="space-y-3 mb-6 border-b pb-4">
                         <!-- Items will be loaded here -->
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-lg font-bold">Total:</span>
-                        <span class="text-2xl font-bold text-purple-700">₹<span id="totalAmount">0</span></span>
+                    <div class="space-y-2 border-t pt-4">
+                        <div class="flex justify-between text-sm"><span>Subtotal:</span><span>₹<span id="subtotalAmount">0</span></span></div>
+                        <div class="flex justify-between text-sm"><span>Tamil Nadu courier charge:</span><span>₹70.00</span></div>
+                        <div class="flex justify-between items-center pt-2"><span class="text-lg font-bold">Total:</span><span class="text-2xl font-bold text-purple-700">₹<span id="totalAmount">0</span></span></div>
                     </div>
                 </div>
             </div>
@@ -269,7 +267,7 @@
     </script>
 
     <script type="module">
-        import { createOrder } from './firebase-init.js?v=20260915-2';
+        const TAMIL_NADU_COURIER_CHARGE = 70;
 
             // Generate UPI QR code (server-side proxy)
             function generateQRCode() {
@@ -292,6 +290,7 @@
         function loadOrderSummary() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const summaryDiv = document.getElementById('orderSummary');
+            const subtotalSpan = document.getElementById('subtotalAmount');
             const totalSpan = document.getElementById('totalAmount');
 
             let total = 0;
@@ -310,83 +309,8 @@
             });
 
             summaryDiv.innerHTML = html || '<p class="text-gray-500">No items in cart</p>';
-            totalSpan.textContent = total.toFixed(2);
-        }
-
-        // Handle form submission
-        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            if (cart.length === 0) {
-                alert('Your cart is empty!');
-                return;
-            }
-
-            // Get form data
-            const password = document.getElementById('password').value;
-            if (!password || password.length < 6) {
-                alert('Please enter a password with at least 6 characters.');
-                return;
-            }
-
-            const orderData = {
-                fullName: document.getElementById('fullName').value,
-                mobile: document.getElementById('mobile').value,
-                email: document.getElementById('email').value,
-                password,
-                address: document.getElementById('address').value,
-                city: document.getElementById('city').value,
-                state: document.getElementById('state').value,
-                pincode: document.getElementById('pincode').value,
-                orderNotes: document.getElementById('orderNotes').value,
-                utrNumber: document.getElementById('utrNumber').value,
-                cartItems: cart,
-                totalAmount: cart.reduce((total, item) => total + (item.price * item.quantity), 0)
-            };
-
-            // Handle screenshot upload if provided
-            const fileInput = document.getElementById('paymentScreenshot');
-            if (fileInput.files && fileInput.files[0]) {
-                const file = fileInput.files[0];
-                
-                // Validate file
-                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-                if (!validTypes.includes(file.type)) {
-                    alert('Invalid file format. Please upload JPG, PNG, or WEBP');
-                    return;
-                }
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File too large. Maximum size is 5MB');
-                    return;
-                }
-
-                // Convert to base64
-                const reader = new FileReader();
-                reader.onload = async (event) => {
-                    orderData.paymentScreenshot = event.target.result;
-                    await submitOrder(orderData);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                await submitOrder(orderData);
-            }
-        });
-
-        async function submitOrder(orderData) {
-            try {
-                const result = await createOrder(orderData);
-                if (result.success) {
-                    // Clear cart
-                    localStorage.removeItem('cart');
-                    // Redirect to success page
-                    window.location.href = `order-success.html?order=${encodeURIComponent(result.orderId)}&mobile=${encodeURIComponent(orderData.mobile)}`;
-                } else {
-                    alert('Error creating order: ' + result.message);
-                }
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
+            subtotalSpan.textContent = total.toFixed(2);
+            totalSpan.textContent = (total + TAMIL_NADU_COURIER_CHARGE).toFixed(2);
         }
 
         document.getElementById('whatsappOrderButton').addEventListener('click', () => {
@@ -397,12 +321,13 @@
             }
 
             const items = cart.map(item => `${item.name} | Size: ${item.size || '-'} | Color: ${item.color || '-'} | Qty: ${item.quantity} | ₹${item.price}`).join('\n');
-            const total = cart.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
+            const subtotal = cart.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
+            const total = subtotal + TAMIL_NADU_COURIER_CHARGE;
             const name = document.getElementById('fullName').value.trim() || 'Not provided';
             const mobile = document.getElementById('mobile').value.trim() || 'Not provided';
             const address = document.getElementById('address').value.trim() || 'Not provided';
             const utr = document.getElementById('utrNumber').value.trim() || 'Not provided';
-            const message = `*LookStylo Order Confirmation Request*\n\nPlease confirm my order.\n\n*Customer:* ${name}\n*Mobile:* ${mobile}\n*Address:* ${address}\n*UTR:* ${utr}\n\n*Items:*\n${items}\n\n*Total:* ₹${total.toFixed(2)}`;
+            const message = `*LookStylo Order Confirmation Request*\n\nPlease confirm my order.\n\n*Customer:* ${name}\n*Mobile:* ${mobile}\n*Address:* ${address}\n*UTR:* ${utr}\n\n*Items:*\n${items}\n\n*Subtotal:* ₹${subtotal.toFixed(2)}\n*Tamil Nadu courier charge:* ₹${TAMIL_NADU_COURIER_CHARGE.toFixed(2)}\n*Total:* ₹${total.toFixed(2)}`;
             window.open(`https://wa.me/918680857511?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
         });
 
