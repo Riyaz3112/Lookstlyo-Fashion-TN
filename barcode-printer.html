@@ -43,21 +43,36 @@
             body * { visibility: hidden; }
             #print-container, #print-container * { visibility: visible; }
             #print-container {
-                display: block !important;
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 101.6mm;
-                margin: 0;
-                padding: 0;
+                display: flex !important;
+                flex-direction: column !important;
+                position: static !important;
+                left: auto !important;
+                top: auto !important;
+                width: 101.6mm !important;
+                max-width: 101.6mm !important;
+                min-width: 101.6mm !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
                 background: white;
-                z-index: 999999;
+                z-index: auto !important;
+                overflow: visible !important;
             }
             #print-container.single-label-layout .thermal-row {
-                break-after: page;
-                page-break-after: always;
+                break-after: auto;
+                page-break-after: auto;
             }
             #print-container.single-label-layout .thermal-row:last-child {
+                break-after: auto;
+                page-break-after: auto;
+            }
+            .thermal-row {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                break-after: auto;
+                page-break-after: auto;
+            }
+            .thermal-row:last-child {
                 break-after: auto;
                 page-break-after: auto;
             }
@@ -1331,6 +1346,8 @@
         function preparePrintLayout(container) {
             const layout = getLabelLayout();
             container.style.width = `${layout.rowWidth}mm`;
+            container.style.display = 'block';
+            container.style.height = 'auto';
             container.classList.toggle('single-label-layout', layout.singleLabel);
             let pageStyle = document.getElementById('dynamic-print-page');
             if (!pageStyle) {
@@ -1338,7 +1355,38 @@
                 pageStyle.id = 'dynamic-print-page';
                 document.head.appendChild(pageStyle);
             }
-            pageStyle.textContent = `@page { size: ${layout.rowWidth}mm 25mm; margin: 0; }`;
+            pageStyle.textContent = `
+                @page {
+                    size: auto;
+                    margin: 0;
+                }
+                @media print {
+                    body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        background: #fff !important;
+                    }
+                    #print-container {
+                        display: block !important;
+                        width: ${layout.rowWidth}mm !important;
+                        max-width: ${layout.rowWidth}mm !important;
+                        height: auto !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        overflow: visible !important;
+                    }
+                    .thermal-row {
+                        page-break-inside: avoid;
+                        break-inside: avoid;
+                        break-after: auto;
+                        page-break-after: auto;
+                    }
+                    .thermal-row:last-child {
+                        break-after: auto;
+                        page-break-after: auto;
+                    }
+                }
+            `;
             return layout;
         }
 
@@ -1522,12 +1570,13 @@
                     } catch(e) {}
                 });
 
+                const rowsNeeded = Math.max(1, Math.ceil(queue.length / layout.labelsPerRow));
                 const opt = {
                     margin: 0,
                     filename: `LookStylo_Barcodes_50x25_${layout.labelsPerRow}up.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2, useCORS: true, logging: false },
-                    jsPDF: { unit: 'mm', format: [layout.rowWidth, 25], orientation: 'landscape' }
+                    jsPDF: { unit: 'mm', format: [layout.rowWidth, 25 * rowsNeeded], orientation: 'portrait' }
                 };
 
                 html2pdf().from(pdfExportDiv).set(opt).save().then(() => {
