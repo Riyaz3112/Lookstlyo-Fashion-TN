@@ -214,18 +214,18 @@
         </div>
     </section>
 
-    <div id="footballArrivalPopup" class="arrival-modal-backdrop fixed inset-0 z-[100] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="arrivalTitle">
+    <div id="stripsStarArrivalPopup" class="arrival-modal-backdrop fixed inset-0 z-[100] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="arrivalTitle">
         <div class="arrival-modal relative grid w-full max-w-3xl overflow-hidden rounded-3xl bg-[#f8f4ef] shadow-2xl md:grid-cols-2">
             <button id="closeArrivalPopup" type="button" class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/70 text-xl text-white transition hover:bg-amber-700" aria-label="Close new arrival popup">&times;</button>
             <div class="min-h-[300px] bg-white p-6 md:min-h-[410px] md:p-8">
-                <img src="IMG11.jpeg" alt="LookStylo Football Jersey" class="h-full w-full object-contain" onerror="this.src='IMG101.jpeg'">
+                <img src="th001.jpeg" alt="Strips Star Shirt" class="h-full w-full object-contain" onerror="this.src='IMG101.jpeg'">
             </div>
             <div class="flex flex-col justify-center p-7 sm:p-10">
                 <p class="mb-3 text-xs font-bold uppercase tracking-[.3em] text-amber-700">New arrival</p>
-                <h2 id="arrivalTitle" class="display text-4xl leading-tight sm:text-5xl">Football Jersey</h2>
-                <p class="mt-4 text-sm leading-6 text-black/60">Bring match-day energy to your everyday style with our new sports jersey.</p>
-                <p class="mt-6 text-2xl font-black text-[#5e2d91]">₹299</p>
-                <button id="shopFootballJersey" type="button" class="mt-7 inline-flex items-center justify-center rounded-xl bg-[#151515] px-5 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-amber-700">Shop the jersey</button>
+                <h2 id="arrivalTitle" class="display text-4xl leading-tight sm:text-5xl">STRIPS STAR SHIRT</h2>
+                <p class="mt-4 text-sm leading-6 text-black/60">Choose from 6 colours and sizes S, M, L or XL. Enjoy 10% off this new arrival.</p>
+                <p class="mt-6 text-2xl font-black text-[#5e2d91]"><span class="mr-2 text-base font-medium text-black/45 line-through">₹599</span>₹539.10</p>
+                <button id="shopStripsStarShirt" type="button" class="mt-7 inline-flex items-center justify-center rounded-xl bg-[#151515] px-5 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-amber-700">Shop the shirt</button>
                 <button id="keepBrowsing" type="button" class="mt-3 text-xs font-bold uppercase tracking-wider text-black/50 transition hover:text-black">Keep browsing</button>
             </div>
         </div>
@@ -262,6 +262,20 @@
     </div>
 
     <script>
+        const stripsStarProduct = {
+            id: 'strips-star-shirt',
+            slug: 'strips-star-shirt',
+            name: 'STRIPS STAR SHIRT',
+            price: 539.10,
+            originalPrice: 599,
+            discountPercent: 10,
+            image: 'th001.jpeg',
+            images: ['th001.jpeg', 'th002.jpeg', 'th003.jpeg', 'th004.jpeg', 'th005.jpeg', 'th006.jpeg', 'th007.jpeg'],
+            description: '6 colours | Sizes: S, M, L, XL',
+            sizes: 'S,M,L,XL',
+            colors: 6
+        };
+
         function closeBanner() {
             document.getElementById('openingBanner').style.display = 'none';
         }
@@ -275,9 +289,15 @@
                 let data;
                 try { data = JSON.parse(responseText); } catch (error) { throw new Error(`Product service returned HTTP ${res.status} instead of JSON.`); }
                 if (!res.ok) throw new Error(data.message || `Product service returned HTTP ${res.status}`);
-                if (data.success) return data.products;
+                if (data.success) {
+                    const products = Array.isArray(data.products) ? data.products : [];
+                    return [stripsStarProduct, ...products.filter(product =>
+                        product.slug !== stripsStarProduct.slug && product.name !== stripsStarProduct.name
+                    )];
+                }
             }catch(e){ console.error(e); }
             return [
+                stripsStarProduct,
                 { id: 1, name: 'Premium Viscous Shirt', price: 599, image: 'IMG101.jpeg', description: 'Viscous fabric', sizes: 'M,L,XL', colors: 3 },
                 { id: 2, name: 'NS Shorts', price: 249, image: 'IMG111.jpeg', description: '3-Line Model | Premium Quality', sizes: 'M,L,XL', colors: 10, bulkPrice: 'Buy 5 @ ₹999' },
                 { id: 3, name: 'Football Jersey', price: 299, image: 'IMG11.jpeg', description: 'Sports-style football jersey', sizes: 'M,L,XL' },
@@ -288,7 +308,10 @@
             ];
         }
 
-        function formatPrice(n){ return '₹' + n; }
+        function formatPrice(n){
+            const amount = Number(n);
+            return '₹' + amount.toFixed(Number.isInteger(amount) ? 0 : 2);
+        }
 
         async function loadProducts(){
             const products = await fetchProducts();
@@ -308,7 +331,7 @@
                         <h3 class="font-bold text-lg mb-2"><a href="shop.html#products" class="hover:underline">${product.name}</a></h3>
                         <p class="text-gray-600 text-sm mb-4">${product.description || ''}</p>
                         ${product.bulkPrice ? `<p class="text-green-700 text-sm font-bold mb-4">${product.bulkPrice}</p>` : ''}
-                        <p class="text-purple-700 font-bold text-xl mb-4">${formatPrice(product.price)}</p>
+                        <p class="text-purple-700 font-bold text-xl mb-4">${product.originalPrice ? `<span class="mr-2 text-sm font-medium text-gray-500 line-through">${formatPrice(product.originalPrice)}</span><span>${formatPrice(product.price)}</span><span class="ml-2 text-xs font-bold text-green-700">${product.discountPercent}% OFF</span>` : formatPrice(product.price)}</p>
                         <button class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 rounded transition add-to-cart-btn" data-product-id="${product.id}" data-product-name="${product.name}" data-product-price="${product.price}">
                             Add to Cart
                         </button>
@@ -327,7 +350,7 @@
             document.querySelectorAll('.product-photo-frame').forEach(photoButton => photoButton.addEventListener('click', () => {
                 openPhotoLightbox(photoButton.dataset.productImage, photoButton.dataset.productName);
             }));
-            showFootballArrivalPopup();
+            showArrivalPopup();
         }
 
         function openPhotoLightbox(image, name) {
@@ -349,8 +372,9 @@
 
         function openCartOptions(event) {
             const button = event.currentTarget;
+            const productId = Number(button.dataset.productId);
             selectedProduct = {
-                id: parseInt(button.dataset.productId),
+                id: Number.isNaN(productId) ? button.dataset.productId : productId,
                 name: button.dataset.productName,
                 price: parseFloat(button.dataset.productPrice)
             };
@@ -384,29 +408,29 @@
             closeCartOptions();
         }
 
-        function closeFootballArrivalPopup() {
-            const popup = document.getElementById('footballArrivalPopup');
+        function closeArrivalPopup() {
+            const popup = document.getElementById('stripsStarArrivalPopup');
             popup.classList.add('hidden');
             popup.classList.remove('flex');
-            sessionStorage.setItem('lookstyloFootballArrivalSeen', 'true');
+            sessionStorage.setItem('lookstyloStripsStarArrivalSeen', 'true');
         }
 
-        function showFootballArrivalPopup() {
-            if (sessionStorage.getItem('lookstyloFootballArrivalSeen') === 'true') return;
-            const popup = document.getElementById('footballArrivalPopup');
+        function showArrivalPopup() {
+            if (sessionStorage.getItem('lookstyloStripsStarArrivalSeen') === 'true') return;
+            const popup = document.getElementById('stripsStarArrivalPopup');
             popup.classList.remove('hidden');
             popup.classList.add('flex');
         }
 
-        document.getElementById('closeArrivalPopup').addEventListener('click', closeFootballArrivalPopup);
-        document.getElementById('keepBrowsing').addEventListener('click', closeFootballArrivalPopup);
-        document.getElementById('shopFootballJersey').addEventListener('click', () => {
-            closeFootballArrivalPopup();
-            const jerseyCard = [...document.querySelectorAll('.collection-card')].find(card => card.textContent.includes('Football Jersey'));
-            if (jerseyCard) jerseyCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('closeArrivalPopup').addEventListener('click', closeArrivalPopup);
+        document.getElementById('keepBrowsing').addEventListener('click', closeArrivalPopup);
+        document.getElementById('shopStripsStarShirt').addEventListener('click', () => {
+            closeArrivalPopup();
+            const shirtCard = [...document.querySelectorAll('.collection-card')].find(card => card.textContent.includes(stripsStarProduct.name));
+            if (shirtCard) shirtCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
-        document.getElementById('footballArrivalPopup').addEventListener('click', (event) => {
-            if (event.target.id === 'footballArrivalPopup') closeFootballArrivalPopup();
+        document.getElementById('stripsStarArrivalPopup').addEventListener('click', (event) => {
+            if (event.target.id === 'stripsStarArrivalPopup') closeArrivalPopup();
         });
         document.getElementById('closePhotoLightbox').addEventListener('click', closePhotoLightbox);
         document.getElementById('photoLightbox').addEventListener('click', (event) => {
@@ -420,7 +444,7 @@
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 closePhotoLightbox();
-                closeFootballArrivalPopup();
+                closeArrivalPopup();
                 closeCartOptions();
             }
         });
